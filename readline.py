@@ -26,6 +26,9 @@ hasher = FeatureHasher(n_features=2000)
 tmp_array = []
 tmp_obj = {}
 nb = 0
+cur_directory = 1
+limit = 5
+current = 0
 
 for tmp_dir in directories:
 	print("directory : ", tmp_dir)
@@ -38,7 +41,12 @@ for tmp_dir in directories:
 		dictionnary.append(tmp_obj);
 		expected_output.append(tmp_output)
 		nb_attr_all += 58057
+		if (current == cur_directory*limit):
+			break
+		current += 1
+		print ("current : ", current)
 	tmp_output = 1;
+	cur_directory += 1
 
 hashed = hasher.transform(d_training)
 hashed = hashed.todense()
