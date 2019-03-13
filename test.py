@@ -5,16 +5,16 @@ import os
 classifier = tree.DecisionTreeClassifier("entropy")
 vectorizer = DictVectorizer(sparse = False)
 
-d_taining = [
+d_training = [
 {'packed':1, 'contains_encrypted':0}, {'packed':0, 'contains_encrypted':0},
 {'packed':0, 'contains_encrypted':0}, {'packed':1, 'contains_encrypted':1},
 {'packed':1, 'contains_encrypted':0}, {'packed':0, 'contains_encrypted':1},
 {'packed':1, 'contains_encrypted':0}, {'packed':0, 'contains_encrypted':0},]
 v_label = [1, 1, 1, 1, 0, 0, 0, 0]
 
-vectorizer.fit(d_taining)
+vectorizer.fit(d_training)
 
-X = vectorizer.transform(d_taining)
+X = vectorizer.transform(d_training)
 y = v_label
 
 classifier.fit(X, y)
