@@ -1,10 +1,13 @@
 import os
 import numpy
+import random
 import subprocess
 from os import listdir
 import pickle as pickle
 from os.path import isfile, join
 from sklearn import tree
+from sklearn import metrics
+from matplotlib import pyplot
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.ensemble import RandomForestClassifier
@@ -62,7 +65,6 @@ for tmp_dir in directories:
 #for i in range(2000):
 #	features_name.append(str(i));
 
-
 #print("data : ", dictionnary)
 
 hashed = hasher.transform(dictionnary)
@@ -70,12 +72,24 @@ hashed = hashed.todense()
 hashed = numpy.asarray(hashed)
 hashed = hashed
 
+tmp_list = list(zip(hashed, expected_output))
+
+random.shuffle(tmp_list)
+
+hashed, expected_output = zip(*tmp_list)
+
+cut = int(0.8*len(hashed))
+training_data = hashed[:cut]
+training_labels = expected_output[:cut]
+testing_data = hashed[cut:]
+testing_labels = expected_output[cut:]
+
 #print("hashed : ", hashed)
 
 #vectorizer.fit(hashed)
 
-X = hashed
-y = expected_output
+X = training_data
+y = training_labels
 randforest.fit(X, y)
 #classifier.fit(X, y)
 
