@@ -50,8 +50,11 @@ for tmp_dir in directories:
 		#print("result[0] : ", result[0])
 		for elem in result:
 			#print("elem : ", elem)
-			nb = result.count(elem)
-			tmp_obj[elem] = nb;
+			#nb = result.count(elem)
+			if elem in tmp_obj:
+				tmp_obj[elem] += 1
+			else:
+				tmp_obj[elem] = 1
 		dictionnary.append(tmp_obj);
 		expected_output.append(tmp_output)
 		nb_attr_all += 58057
@@ -105,8 +108,11 @@ for file in test_files:
 	result = subprocess.Popen(["./convert.sh", "challenge/" + file], stdout=subprocess.PIPE).communicate()[0]
 	result = result.decode("ascii").split('@')
 	for elem in result:
-		nb = result.count(elem)
-		tmp_obj[elem] = nb;
+		#nb = result.count(elem)
+		if elem in tmp_obj:
+			tmp_obj[elem] += 1
+		else:
+			tmp_obj[elem] = 1
 
 	#print("[debug] tmp_obj : ", tmp_obj)
 	print("Hashing of the data of ", file)
