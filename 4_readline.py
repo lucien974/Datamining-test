@@ -59,8 +59,9 @@ for tmp_dir in directories:
 	tmp_output = 1;
 	cur_directory += 1
 
-for i in range(2000):
-	features_name.append(str(i));
+#for i in range(2000):
+#	features_name.append(str(i));
+
 
 #print("data : ", dictionnary)
 
