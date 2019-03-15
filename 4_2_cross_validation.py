@@ -8,9 +8,10 @@ from os.path import isfile, join
 from sklearn import tree
 from sklearn import metrics
 from matplotlib import pyplot
-from sklearn.feature_extraction import DictVectorizer
-from sklearn.feature_extraction import FeatureHasher
+from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_extraction import FeatureHasher
+from sklearn.feature_extraction import DictVectorizer
 
 path_to_data = "samples/"
 directories = ["benignware", "malware"]
@@ -31,13 +32,7 @@ limit = 150
 current = 0
 features_name = []
 
-def train_classifier(hash_list, cut, expected_output, save):
-	# Divide the data
-	training_data = hash_list[:cut]
-	training_labels = expected_output[:cut]
-	testing_data = hash_list[cut:]
-	testing_labels = expected_output[cut:]
-
+def train_classifier(training_data, training_labels, testing_data, testing_labels, save):
 	# Train the classifier
 	X = training_data
 	y = training_labels
@@ -50,7 +45,6 @@ def train_classifier(hash_list, cut, expected_output, save):
 	# Initialisation for the ROC curve
 	fpr = []
 	tpr = []
-	size = len(testing_labels)
 
 	# Compute fpr and tpr of the classifier
 	result = randforest.predict(testing_data)
@@ -116,8 +110,12 @@ hashed, expected_output = zip(*tmp_list)
 
 #print("cut : ", cut, ", len : ", len(hashed))
 
-# Test the data in 3 different subset
-train_classifier(hashed, int(0.95*len(hashed)), expected_output, "95")
-train_classifier(hashed, int(0.75*len(hashed)), expected_output, "75")
-train_classifier(hashed, int(0.5*len(hashed)), expected_output, "50")
-pyplot.savefig('multi_roc.png')
+kf = KFold(n_splits=10)
+hashed = numpy.array(hashed)
+expected_output = numpy.array(expected_output)
+for train_index, test_index in kf.split(hashed):
+	#print("train_index : ", train_index, ", test_index : ", test_index)
+	X_train, X_test = hashed[train_index], hashed[test_index]
+	y_train, y_test = expected_output[train_index], expected_output[test_index]
+	train_classifier(X_train, y_train, X_test, y_test, "x-validation")
+pyplot.savefig('cross_validation.png')
