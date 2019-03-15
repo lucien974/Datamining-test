@@ -46,8 +46,8 @@ def train_classifier(hash_list, cut, expected_output, save):
 	randforest.fit(X, y)
 
 	# Save the classifier with pickle
-	with open('classifier_strings','wb') as fp:
-	    pickle.dump(classifier,fp)
+	#with open('classifier_strings','wb') as fp:
+	#    pickle.dump(classifier,fp)
 
 	# Initialisation for the ROC curve
 	fpr = []
@@ -63,7 +63,7 @@ def train_classifier(hash_list, cut, expected_output, save):
 
 	# Show the ROC curve of the classifier
 	pyplot.title('Receiver Operating Characteristic')
-	pyplot.plot(fpr, tpr, label='ROC curve (area = %0.3f)' % auc)
+	pyplot.plot(fpr, tpr, label='ROC curve (area = %0.3f), split %s' %(auc, save))
 	pyplot.legend(loc = 'lower right')
 	pyplot.plot([0, 1], [0, 1],'r--')
 	pyplot.xlim([0, 1])
