@@ -28,9 +28,10 @@ tmp_array = []
 tmp_obj = {}
 nb = 0
 cur_directory = 1
-limit = 150
+limit = -1
 current = 0
 features_name = []
+prev_read = 0
 
 def train_classifier(training_data, training_labels, testing_data, testing_labels, save):
 	# Train the classifier
@@ -67,7 +68,7 @@ def train_classifier(training_data, training_labels, testing_data, testing_label
 
 # Extract strings in files
 for tmp_dir in directories:
-	print("directory : ", tmp_dir)
+	#print("directory : ", tmp_dir)
 	onlyfiles = [f for f in listdir(path_to_data + tmp_dir) if isfile(join(path_to_data + tmp_dir, f))]
 	# For each file in the current folder
 	for file in onlyfiles:
@@ -91,10 +92,12 @@ for tmp_dir in directories:
 		expected_output.append(tmp_output)
 		current += 1
 		# if the number of files reach the limit
-		if (current == cur_directory*limit):
+		if (limit > 0 and current == cur_directory*limit):
 			break
 	tmp_output = 1;
 	cur_directory += 1
+	print(current - prev_read, " files read in directory ", tmp_dir)
+	prev_read = current;
 #print("dictionnary : ", len(dictionnary))
 
 # Hash the dictionnary

@@ -8,6 +8,8 @@ from os.path import isfile, join
 from sklearn import tree
 from sklearn import metrics
 from matplotlib import pyplot
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.ensemble import RandomForestClassifier
@@ -21,13 +23,19 @@ dictionnary = []
 classifier = tree.DecisionTreeClassifier("entropy")
 randforest = RandomForestClassifier(n_jobs=2)
 vectorizer = DictVectorizer(sparse = False)
-hasher = FeatureHasher(n_features=2000)
+hasher = FeatureHasher(n_features=4000)
+kernel = 1.0 * RBF(1.0)
+gpc = GaussianProcessClassifier(kernel=kernel, random_state=0)
+
+d_training = [{'packed':1, 'contains_encrypted':0}, {'packed':0, 'contains_encrypted':0},
+{'packed':0, 'contains_encrypted':0}, {'packed':1, 'contains_encrypted':1}]
+v_label = [1, 1, 0, 0]
 
 tmp_array = []
 tmp_obj = {}
 nb = 0
 cur_directory = 1
-limit = -1
+limit = 150
 current = 0
 features_name = []
 
@@ -53,11 +61,11 @@ for tmp_dir in directories:
 		nb_attr_all += len(tmp_obj)
 		# Clear tmp_obj
 		tmp_obj = {}
-		# Append the expected output relative to the folder ("malware" or "benign")
+		# Append the expected output relative to the folder ("malware" or "bnign")
 		expected_output.append(tmp_output)
 		current += 1
 		# if the number of files reach the limit
-		if (limit > 0 and current == cur_directory*limit):
+		if (current == cur_directory*limit):
 			break
 	tmp_output = 1;
 	cur_directory += 1
@@ -89,11 +97,40 @@ X = training_data
 y = training_labels
 #print("training_data : ", training_data)
 #print("training_labels : ", training_labels)
-randforest.fit(X, y)
+gpc.fit(X, y)
+#randforest.fit(X, y)
 
 # Save the classifier with pickle
 with open('classifier_strings','wb') as fp:
     pickle.dump(classifier,fp)
+
+# Initialisation for the ROC curve
+tp = 0
+fp = 0
+tn = 0
+fn = 0
+fpr = []
+tpr = []
+size = len(testing_labels)
+
+# Compute fpr and tpr of the classifier
+result = gpc.predict(testing_data)
+fpr, tpr, thresholds = metrics.roc_curve(testing_labels, result)
+auc = metrics.roc_auc_score(testing_labels, result)
+#print("fpr : ", fpr)
+#print("tpr : ", tpr)
+
+# Show the ROC curve of the classifier
+pyplot.title('Receiver Operating Characteristic')
+pyplot.plot(fpr, tpr, label='ROC curve (area = %0.3f)' % auc)
+pyplot.legend(loc = 'lower right')
+pyplot.plot([0, 1], [0, 1],'r--')
+pyplot.xlim([0, 1])
+pyplot.ylim([0, 1])
+pyplot.ylabel('True Positive Rate')
+pyplot.xlabel('False Positive Rate')
+#pyplot.show()
+pyplot.savefig('gaussian_process.png')
 
 # Initialisation for the challenge
 tmp_obj = {}
@@ -121,6 +158,8 @@ tmp_hash = numpy.asarray(tmp_hash)
 # Print the results
 print("| filename | malware probability | benign probabilty |")
 print("|--------|--------|--------|")
-for table, file in zip(randforest.predict_proba(tmp_hash), test_files):
+for table, file in zip(gpc.predict_proba(tmp_hash), test_files):
 	minus_p, p = table
 	print("| ", file, " | ", p, " | ", minus_p, " |")
+
+print("prediction results : ", gpc.predict(tmp_hash))

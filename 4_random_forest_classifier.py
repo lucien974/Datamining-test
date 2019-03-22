@@ -31,7 +31,7 @@ tmp_array = []
 tmp_obj = {}
 nb = 0
 cur_directory = 1
-limit = 150
+limit = -1
 current = 0
 features_name = []
 
@@ -143,9 +143,11 @@ for file in test_files:
 			tmp_obj[elem] = 1
 	#print("Hashing of the data of ", file)
 	tf_do_i_need_this.append(tmp_obj)
-	tmp_hash = hasher.transform(tf_do_i_need_this)
-	tmp_hash = tmp_hash.todense()
-	tmp_hash = numpy.asarray(tmp_hash)
+	# Clear tmp_obj
+	tmp_obj = {}
+tmp_hash = hasher.transform(tf_do_i_need_this)
+tmp_hash = tmp_hash.todense()
+tmp_hash = numpy.asarray(tmp_hash)
 
 # Print the results
-print("prdiction results : ", randforest.predict(tmp_hash))
+print("prediction results : ", randforest.predict(tmp_hash))
